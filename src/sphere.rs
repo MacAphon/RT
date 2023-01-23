@@ -12,7 +12,7 @@ impl Hittable for Sphere {
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
         let half_b = oc.dot(r.direction);
-        let c = oc.length_squared() - self.radius.powi(2);
+        let c = oc.length_squared() - self.radius*self.radius;
 
         let discriminant = half_b*half_b - a*c;
         if discriminant < 0. {
@@ -31,10 +31,16 @@ impl Hittable for Sphere {
         let outward_normal = (p - self.center) / self.radius;
 
         Some(HitRecord::new(
+            root,  // t
             p,
-            root,
             r,
             outward_normal,
         ))
+    }
+}
+
+impl Sphere {
+    pub fn new_boxed(center: Vec3, radius: f64) -> Box<dyn Hittable> {
+        Box::new(Sphere { center, radius })
     }
 }
