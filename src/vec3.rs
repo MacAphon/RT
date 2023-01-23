@@ -124,6 +124,16 @@ impl Vec3 {
         p
     }
 
+    pub fn new_random_in_hemisphere(normal: Vec3) -> Vec3 {
+        let in_unit_sphere = Vec3::new_random_in_unit_sphere();
+        if in_unit_sphere.dot(normal) > 0. {
+            in_unit_sphere
+        }
+        else {
+            -in_unit_sphere
+        }
+    }
+
     pub fn new_random_unit_vector() -> Vec3 {
         Vec3::new_random_in_unit_sphere().unit_vector()
     }

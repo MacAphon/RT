@@ -1,10 +1,13 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use crate::color::Color;
+use crate::material::Material;
 
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
+    pub mat: Box<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -13,6 +16,7 @@ impl HitRecord {
     pub fn new(t: f64,
                p: Vec3,
                r: &Ray,
+               mat: Box<dyn Material>,
                outward_normal: Vec3
     ) -> HitRecord {
 
@@ -22,6 +26,7 @@ impl HitRecord {
         HitRecord{
             p,
             normal,
+            mat,
             t,
             front_face,
         }
@@ -31,6 +36,7 @@ impl HitRecord {
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
+
 
 #[derive(Default)]
 pub struct HittableList {

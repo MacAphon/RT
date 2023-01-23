@@ -18,13 +18,29 @@ impl Ray {
             return Color::new_from_vec3(Vec3(0., 0., 0.));
         }
         let mut rec : HitRecord = Default::default();
-        if world.hit(self, 0., f64::INFINITY, &mut rec) {
-            /* Solid color
+
+        // slight offset to prevent shadow acne problem
+        if world.hit(self, 0.001, f64::INFINITY, &mut rec) {
+            /*
+            // Solid color
             return Color::new_from_vec3(Vec3(1., 0., 0.));
             */
+
+            // Diffuse:
+            // Approximation 1
+            /*let target = rec.p + rec.normal + Vec3::new_random_in_unit_sphere();*/
+
+            // Lambertian Reflection
             let target = rec.p + rec.normal + Vec3::new_random_unit_vector();
+
+            // Approximation 2
+            /*let target = rec.p + Vec3::new_random_in_hemisphere(rec.normal);*/
+
             return  Color::new_from_vec3( 0.5 * Ray{origin: rec.p, direction: target-rec.p}.ray_color(&world, depth-1).color );
-            /* Color with normal vector
+
+
+            /*
+            //Color with normal vector
             return Color::new_from_vec3( 0.5 * (rec.normal + Vec3(1., 1., 1.)) );
             */
         }
