@@ -1,9 +1,12 @@
 [package]
 name = "RT"
+description = "A Ray Tracer, following 'Ray Tracing in One Weekend'"
 version = "0.2.0"
 edition = "2021"
 authors = ["Christian Korn <c.a.konr@gmx.de>"]
+repository = "https://github.com/MacAphon/RT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rand = "0.8.5"

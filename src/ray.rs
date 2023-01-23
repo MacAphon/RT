@@ -16,11 +16,11 @@ impl Ray {
     pub fn ray_color(&self, world: &HittableList) -> Color {
         let mut rec : HitRecord = Default::default();
         if world.hit(self, 0., f64::INFINITY, &mut rec) {
-            return Color(0.5 * (rec.normal + Vec3(1., 1., 1.)));
+            return Color::new_from_vec3( 0.5 * (rec.normal + Vec3(1., 1., 1.)) );
         }
         // if we don't hit anything, draw the background
         let unit_direction = self.direction.unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.);
-        Color((1.-t) * Vec3(1., 1., 1.) + t * Color::new(0.5, 0.7, 1.0).0)
+        Color::new_from_vec3( (1. - t) * Vec3(1., 1., 1.) + t * Vec3(0.5, 0.7, 1.0), )
     }
 }
