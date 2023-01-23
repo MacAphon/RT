@@ -16,10 +16,10 @@ use std::{fs::File, io::Write, thread, time};
 use rand::prelude::*;
 
 
-// const ASPECT_RATIO: f64 = 16./9.;
-const ASPECT_RATIO: f64 = 4. / 3.;
-// const IMAGE_HEIGHT: u32 = 1080;
-const IMAGE_HEIGHT: u32 = 256;
+const ASPECT_RATIO: f64 = 16./9.;
+// const ASPECT_RATIO: f64 = 4. / 3.;
+const IMAGE_HEIGHT: u32 = 1080;
+// const IMAGE_HEIGHT: u32 = 256;
 const VIEWPORT_HEIGHT: f64 = 2.;
 const FOCAL_LENGTH: f64 = 1.;
 const ORIGIN: Vec3 = Vec3(0., 0., 0.);
@@ -41,16 +41,22 @@ fn main() -> std::io::Result<()> {
     let image_height: u32 = IMAGE_HEIGHT;
     let image_width: u32 = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as u32;
     let viewport_height: f64 = VIEWPORT_HEIGHT;
-    let max_color: u8 = 255;
+    let max_color: u32 = 255;
     let focal_length: f64 = FOCAL_LENGTH;
     let origin: Vec3 = ORIGIN;
     let samples_per_pixel: u32 = SAMPLES_PER_PIXEL;
+
+    // World
 
     let mut world: HittableList = Default::default();
     world.add(Sphere::new_boxed(Vec3(0., 0., -1.), 0.5));
     world.add(Sphere::new_boxed(Vec3(0., -100.5, -1.), 100.));
 
+    // Camera
+
     let cam: Camera = Camera::new(aspect_ratio, viewport_height, focal_length, origin);
+
+    // prepare output ppm-file
 
     let mut file = File::create("test1.ppm")?;
     file.write_all(format!("P3\n{} {}\n{}\n", image_width, image_height, max_color).as_bytes())?;
