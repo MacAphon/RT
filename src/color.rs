@@ -16,9 +16,9 @@ impl fmt::Display for Color {
 
         let scale = 1. / self.samples as f64;
 
-        r *= scale;
-        g *= scale;
-        b *= scale;
+        r = (r * scale).sqrt();
+        g = (g * scale).sqrt();
+        b = (b * scale).sqrt();
 
         writeln!(f, "{} {} {}",
                  (r * self.max) as u32,

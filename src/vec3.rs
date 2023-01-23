@@ -1,4 +1,6 @@
+use crate::util::*;
 use std::ops::*;
+use rand::random;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Vec3(pub f64, pub f64, pub f64);
@@ -103,6 +105,27 @@ impl Vec3 {
 
     pub fn unit_vector(self: Vec3) -> Vec3 {
         self / self.length()
+    }
+
+    pub fn new_random() -> Vec3 {
+        Vec3(random(), random(), random())
+    }
+
+    pub fn new_random_range(min: f64, max: f64) -> Vec3 {
+        Vec3(rand_f64(min, max), rand_f64(min, max), rand_f64(min, max))
+    }
+
+    pub fn new_random_in_unit_sphere() -> Vec3 {
+        let mut p: Vec3;
+        loop {
+            p = Vec3::new_random_range(-1., 1.);
+            if p.length_squared() < 1. { break }
+        }
+        p
+    }
+
+    pub fn new_random_unit_vector() -> Vec3 {
+        Vec3::new_random_in_unit_sphere().unit_vector()
     }
 
     pub fn x(self) -> f64 {
