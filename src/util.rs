@@ -8,5 +8,5 @@ pub fn clamp<T: PartialOrd>(v: T, min: T, max: T) -> T {
 
 pub fn rand_f64(min: f64, max: f64) -> f64 {
     // [min, max) other notation: [min, max[
-    min + (max-min)*random::<f64>()
+    min + (max - min) * random::<f64>()
 }

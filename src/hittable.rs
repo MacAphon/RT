@@ -3,7 +3,7 @@ use crate::vec3::Vec3;
 use crate::color::Color;
 use crate::material::Material;
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone)]
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,

@@ -7,14 +7,16 @@ mod camera;
 mod util;
 mod material;
 
+use std::{fs::File, io, io::Write, time};
+use rand::random;
+
 use crate::vec3::Vec3;
 use crate::hittable::HittableList;
 use crate::camera::Camera;
 use crate::color::Color;
 use crate::sphere::Sphere;
-
-use std::{fs::File, io, io::Write, time};
-use rand::random;
+use crate::material::lambertian::Lambertian;
+use crate::material::metal::Metal;
 
 // const ASPECT_RATIO: f64 = 16./9.;
 const ASPECT_RATIO: f64 = 4. / 3.;
@@ -23,7 +25,7 @@ const IMAGE_HEIGHT: u32 = 256;
 const VIEWPORT_HEIGHT: f64 = 2.;
 const FOCAL_LENGTH: f64 = 1.;
 const ORIGIN: Vec3 = Vec3(0., 0., 0.);
-const SAMPLES_PER_PIXEL: u32 = 100;
+const SAMPLES_PER_PIXEL: u32 = 50;
 const MAX_DEPTH: u32 = 16;
 
 fn main() -> io::Result<()> {
@@ -37,11 +39,58 @@ fn main() -> io::Result<()> {
     let samples_per_pixel: u32 = SAMPLES_PER_PIXEL;
     let max_depth: u32 = MAX_DEPTH;
 
-    // World
+    // World setup
+
+    let ground_material = Lambertian::new(
+            Color::new_from_vec3(
+                Vec3(0.5, 0.5, 0.5)
+            )
+        );
+    let center_material = Lambertian::new(
+            Color::new_from_vec3(
+                Vec3(1., 0.7, 0.5)
+            )
+    );
+    let left_material = Metal::new(
+            Color::new_from_vec3(
+                Vec3(1., 1., 1.)
+            )
+        );
+    let right_material = Metal::new(
+            Color::new_from_vec3(
+                Vec3(0.5, 0.7, 1.)
+            )
+        );
 
     let mut world: HittableList = Default::default();
-    world.add(Sphere::new_boxed(Vec3(0., 0., -1.), 0.5));
-    world.add(Sphere::new_boxed(Vec3(0., -100.5, -1.), 100.));
+    world.add(
+        Sphere::new_boxed(
+            Vec3(0., 0., -1.),
+            0.5,
+            Box::new(center_material),
+        )
+    );
+    world.add(
+        Sphere::new_boxed(
+            Vec3(-1., 0., -1.),
+            0.5,
+            Box::new(left_material),
+        )
+    );
+    world.add(
+        Sphere::new_boxed(
+            Vec3(1., 0., -1.),
+            0.5,
+            Box::new(right_material),
+        )
+    );
+    world.add(
+        Sphere::new_boxed(
+            Vec3(0., -100.5, -1.),
+            100.,
+            Box::new(ground_material),
+        )
+    );
 
     // Camera
 

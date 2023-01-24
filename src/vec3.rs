@@ -85,11 +85,11 @@ impl DivAssign<f64> for Vec3 {
 }
 
 impl Vec3 {
-    pub fn length_squared(self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.0.powi(2) + self.1.powi(2) + self.2.powi(2)
     }
 
-    pub fn length(self) -> f64 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
@@ -105,6 +105,15 @@ impl Vec3 {
 
     pub fn unit_vector(self: Vec3) -> Vec3 {
         self / self.length()
+    }
+
+    pub fn is_near_zero(self) -> bool {
+        let s = 1e-8;
+        (self.0.abs() < s) && (self.1.abs() < s) && (self.2.abs() < s)
+    }
+
+    pub fn reflect(self, n: Vec3) -> Vec3 {
+        self - 2.*self.dot(n)*n
     }
 
     pub fn new_random() -> Vec3 {

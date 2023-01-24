@@ -21,32 +21,51 @@ impl Ray {
 
         // slight offset to prevent shadow acne problem
         if world.hit(self, 0.001, f64::INFINITY, &mut rec) {
-            /*
-            // Solid color
-            return Color::new_from_vec3(Vec3(1., 0., 0.));
-            */
 
-            // Diffuse:
-            // Approximation 1
-            /*let target = rec.p + rec.normal + Vec3::new_random_in_unit_sphere();*/
-
-            // Lambertian Reflection
-            let target = rec.p + rec.normal + Vec3::new_random_unit_vector();
-
-            // Approximation 2
-            /*let target = rec.p + Vec3::new_random_in_hemisphere(rec.normal);*/
-
-            return  Color::new_from_vec3( 0.5 * Ray{origin: rec.p, direction: target-rec.p}.ray_color(&world, depth-1).color );
-
-
-            /*
-            //Color with normal vector
-            return Color::new_from_vec3( 0.5 * (rec.normal + Vec3(1., 1., 1.)) );
-            */
+            let temp = rec.mat.scatter(&self, &rec);
+            return if temp.0 {
+                Color::new_from_vec3(
+                    temp.2.color *
+                        temp.1.ray_color(&world, depth-1)
+                            .color
+                )
+            } else {
+                Color::new_from_vec3(Vec3(0., 0., 0.))
+            }
         }
         // if we don't hit anything, draw the background
         let unit_direction = self.direction.unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.);
-        Color::new_from_vec3( (1. - t) * Vec3(1., 1., 1.) + t * Vec3(0.5, 0.7, 1.0), )
+        Color::new_from_vec3(
+            (1. - t) * Vec3(1., 1., 1.)
+                + t * Vec3(0.5, 0.7, 1.0),
+        )
     }
 }
+
+// old methods:
+/*
+// Solid color
+return Color::new_from_vec3(Vec3(1., 0., 0.));
+*/
+
+// Diffuse:
+// Approximation 1
+/*let target = rec.p + rec.normal + Vec3::new_random_in_unit_sphere();*/
+
+// Lambertian Reflection
+/*let target = rec.p + rec.normal + Vec3::new_random_unit_vector();*/
+
+// Approximation 2
+/*let target = rec.p + Vec3::new_random_in_hemisphere(rec.normal);*/
+
+/*return  Color::new_from_vec3(
+    0.5 * Ray{origin: rec.p, direction: target-rec.p}
+        .ray_color(&world, depth-1).color
+);*/
+
+
+/*
+//Color with normal vector
+return Color::new_from_vec3( 0.5 * (rec.normal + Vec3(1., 1., 1.)) );
+*/
