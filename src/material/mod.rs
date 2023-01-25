@@ -1,6 +1,7 @@
 mod default_material;
 pub mod metal;
 pub mod lambertian;
+pub mod dielectric;
 
 use std::fmt::Debug;
 use crate::color::Color;

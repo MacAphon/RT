@@ -3,7 +3,7 @@ use crate::hittable::HitRecord;
 use crate::material::Material;
 use crate::ray::Ray;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct DefaultMaterial {}
 
 impl Material for DefaultMaterial {
