@@ -22,12 +22,12 @@ const ASPECT_RATIO: f64 = 16./9.;
 // const ASPECT_RATIO: f64 = 4. / 3.;
 const IMAGE_HEIGHT: u32 = 1080;
 // const IMAGE_HEIGHT: u32 = 256;
-const VFOV: f64 = 55.;  // vertical field of view
+const VFOV: f64 = 15.;  // vertical field of view
 const ORIGIN: Vec3 = Vec3(-4., 1., 0.);
 const TARGET: Vec3 = Vec3(0., 0., -2.);
 const VUP: Vec3 = Vec3(0., 1., 0.);
-const SAMPLES_PER_PIXEL: u32 = 50;
-const MAX_DEPTH: u32 = 16;
+const SAMPLES_PER_PIXEL: u32 = 100;
+const MAX_DEPTH: u32 = 8;
 
 fn main() -> io::Result<()> {
     let aspect_ratio = ASPECT_RATIO;
@@ -40,6 +40,11 @@ fn main() -> io::Result<()> {
     let vup: Vec3 = VUP;
     let samples_per_pixel: u32 = SAMPLES_PER_PIXEL;
     let max_depth: u32 = MAX_DEPTH;
+
+    println!("starting render:");
+    println!("- {} by {} pixels", image_height, image_width);
+    println!("- {} samples per pixel", samples_per_pixel);
+    println!("- up to {} bounces per sample\n", max_depth);
 
     // World setup
 
@@ -55,7 +60,7 @@ fn main() -> io::Result<()> {
     );
     let left_material = Metal::new(
         Color::new_from_vec3(
-            Vec3(1., 0.5, 0.2)
+            Vec3(0.8, 0.05, 0.1)
         ),
         0.,
     );
@@ -71,14 +76,14 @@ fn main() -> io::Result<()> {
     world.add(
         Sphere::new_boxed(
             Vec3(0., 0., -2.),
-            0.5,
+            0.499,
             Box::new(left_material),
         )
     );
     world.add(
         Sphere::new_boxed(
             Vec3(-1., 0., -2.),
-            0.5,
+            0.499,
             Box::new(dielectric_left),
         )
     );
@@ -92,14 +97,14 @@ fn main() -> io::Result<()> {
     world.add(
         Sphere::new_boxed(
             Vec3(1., 0., -2.),
-            0.5,
+            0.499,
             Box::new(right_material),
         )
     );
     world.add(
         Sphere::new_boxed(
-            Vec3(0., -100.5, -2.),
-            100.,
+            Vec3(0., -1000.5, -2.),
+            1000.,
             Box::new(ground_material),
         )
     );
