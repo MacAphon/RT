@@ -14,7 +14,7 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn ray_color(&self, world: &HittableList, depth: u32) -> Color {
+    pub fn ray_color(&self, world: &HittableList, depth: usize) -> Color {
         if depth == 0 {
             return Color::new_from_vec3(Vec3(0., 0., 0.));
         }

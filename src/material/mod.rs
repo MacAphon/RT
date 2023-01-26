@@ -9,7 +9,6 @@ use crate::hittable::hit_record::HitRecord;
 use crate::material::default_material::DefaultMaterial;
 use crate::ray::Ray;
 
-
 pub trait Material: CloneMaterial + Debug {
     fn scatter(&self, r_in: &Ray, record: &HitRecord) -> (bool, Ray, Color);
 }

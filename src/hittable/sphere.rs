@@ -3,6 +3,7 @@ use crate::ray::Ray;
 use crate::hittable::*;
 use crate::material::Material;
 
+#[derive(Default, Debug, Clone)]
 pub struct Sphere{
     pub center: Vec3,
     pub radius: f64,
@@ -42,6 +43,8 @@ impl Hittable for Sphere {
         ))
     }
 }
+
+unsafe impl Send for Sphere {}
 
 impl Sphere {
     pub fn new_boxed(center: Vec3, radius: f64, material: Box<dyn Material>) -> Box<dyn Hittable> {

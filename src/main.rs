@@ -6,7 +6,8 @@ mod camera;
 mod util;
 mod material;
 
-use std::{fs::File, io, io::Write, time};
+use std::{fs::File, io, io::Write, thread, time};
+use std::borrow::Borrow;
 use rand::random;
 
 use crate::vec3::Vec3;
@@ -20,37 +21,37 @@ use crate::material::metal::Metal;
 
 const ASPECT_RATIO: f64 = 16./9.;
 // const ASPECT_RATIO: f64 = 4. / 3.;
-const IMAGE_HEIGHT: u32 = 1080;
-// const IMAGE_HEIGHT: u32 = 256;
+const IMAGE_HEIGHT: usize = 1080;
+// const IMAGE_HEIGHT: usize = 256;
 const VFOV: f64 = 15.;  // vertical field of view
 const ORIGIN: Vec3 = Vec3(-4., 1., 0.);
 const TARGET: Vec3 = Vec3(0., 0., -2.);
 const VUP: Vec3 = Vec3(0., 1., 0.);
-const SAMPLES_PER_PIXEL: u32 = 100;
-const MAX_DEPTH: u32 = 8;
+const SAMPLES_PER_PIXEL: usize = 100;
+const MAX_DEPTH: usize = 16;
 
 fn main() -> io::Result<()> {
     let aspect_ratio = ASPECT_RATIO;
-    let image_height: u32 = IMAGE_HEIGHT;
-    let image_width: u32 = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as u32;
+    let image_height: usize = IMAGE_HEIGHT;
+    let image_width: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     let vfov: f64 = VFOV;
-    let max_color: u32 = 255;
+    let max_color: usize = 255;
     let origin: Vec3 = ORIGIN;
     let target: Vec3 = TARGET;
     let vup: Vec3 = VUP;
-    let samples_per_pixel: u32 = SAMPLES_PER_PIXEL;
-    let max_depth: u32 = MAX_DEPTH;
+    let samples_per_pixel: usize = SAMPLES_PER_PIXEL;
+    let max_depth: usize = MAX_DEPTH;
 
     println!("starting render:");
     println!("- {} by {} pixels", image_height, image_width);
     println!("- {} samples per pixel", samples_per_pixel);
-    println!("- up to {} bounces per sample\n", max_depth);
+    println!("- up to {} bounces per sample", max_depth);
 
     // World setup
 
     let ground_material = Lambertian::new(
             Color::new_from_vec3(
-                Vec3(0.5, 0.5, 0.5)
+                Vec3(0.4, 0.7, 0.2)
             )
         );
     let center_material = Lambertian::new(
@@ -73,6 +74,7 @@ fn main() -> io::Result<()> {
     let dielectric_left = Dielectric::new(1.5);
 
     let mut world: HittableList = Default::default();
+
     world.add(
         Sphere::new_boxed(
             Vec3(0., 0., -2.),
@@ -90,7 +92,7 @@ fn main() -> io::Result<()> {
     world.add(
         Sphere::new_boxed(
             Vec3(-1., 0., -2.),
-            -0.45,
+            -0.47,
             Box::new(dielectric_left),
         )
     );
@@ -120,6 +122,37 @@ fn main() -> io::Result<()> {
 
     let start_time = time::Instant::now();
 
+    let mut children = vec![];
+
+    for i_y in (0..image_height).rev() {
+        let world_clone = world.clone();
+        children.push(thread::spawn(move || -> Vec<String> {
+            let mut pixel_colors = Vec::with_capacity(image_width);
+            for i_x in 0..image_width {
+                let mut pixel_color = Color::new(0., 0., 0., samples_per_pixel, 255.999);
+
+                for _ in 0..samples_per_pixel {
+                    let u: f64 = (i_x as f64 + random::<f64>()) / (image_width) as f64;
+                    let v: f64 = (i_y as f64 + random::<f64>()) / (image_height) as f64;
+                    let ray = cam.get_ray(u, v);
+                    pixel_color.color += ray.ray_color(&world_clone, max_depth).color;
+                }
+
+                pixel_colors.push(format!("{}", pixel_color).to_owned());
+            }
+            pixel_colors
+        }));
+    }
+
+    for child in children {
+        let x = child.join().unwrap();
+
+        for i in x {
+            file.write_all(i.as_bytes())?;
+        }
+    }
+
+    /*
     // go from top to bottom
     for i_y in (0..image_height).rev() {
 
@@ -141,6 +174,7 @@ fn main() -> io::Result<()> {
         }
     }
 
+     */
     let duration = time::Instant::elapsed(&start_time);
 
     println!("\nDone.");

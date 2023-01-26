@@ -4,7 +4,7 @@ use crate::vec3::Vec3;
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Color {
     pub color: Vec3,
-    pub samples: u32,
+    pub samples: usize,
     pub max: f64,
 }
 
@@ -21,15 +21,15 @@ impl fmt::Display for Color {
         b = (b * scale).sqrt();
 
         writeln!(f, "{} {} {}",
-                 (r * self.max) as u32,
-                 (g * self.max) as u32,
-                 (b * self.max) as u32,
+                 (r * self.max) as usize,
+                 (g * self.max) as usize,
+                 (b * self.max) as usize,
         )
     }
 }
 
 impl Color {
-    pub fn new(r: f64, g: f64, b: f64, samples: u32, max: f64) -> Color {
+    pub fn new(r: f64, g: f64, b: f64, samples: usize, max: f64) -> Color {
         Color { color: Vec3(r, g, b), samples, max}
     }
     pub fn new_with_default(r: f64, g: f64, b: f64) -> Color {
