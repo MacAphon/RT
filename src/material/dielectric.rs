@@ -1,7 +1,6 @@
-use float_ord::sort;
 use rand::random;
 use crate::color::Color;
-use crate::hittable::HitRecord;
+use crate::hittable::hit_record::HitRecord;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::util::{min_f64, rand_f64};

@@ -5,7 +5,7 @@ pub mod dielectric;
 
 use std::fmt::Debug;
 use crate::color::Color;
-use crate::hittable::HitRecord;
+use crate::hittable::hit_record::HitRecord;
 use crate::material::default_material::DefaultMaterial;
 use crate::ray::Ray;
 

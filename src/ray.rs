@@ -1,6 +1,7 @@
 use crate::vec3::Vec3;
 use crate::color::Color;
-use crate::hittable::*;
+use crate::hittable::hit_record::HitRecord;
+use crate::hittable::hittable_list::HittableList;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Ray{

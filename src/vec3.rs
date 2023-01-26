@@ -1,7 +1,6 @@
 use std::cmp::*;
 use crate::util::*;
 use std::ops::*;
-use float_ord::sort;
 use rand::random;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
