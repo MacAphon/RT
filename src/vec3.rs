@@ -3,72 +3,97 @@ use crate::util::*;
 use std::ops::*;
 use rand::random;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct Vec3(pub f64, pub f64, pub f64);
+#[derive(Debug, Clone, Copy, PartialOrd, PartialEq)]
+pub struct Vec3 {
+    x: f64,
+    y: f64,
+    z: f64,
+}
 
 impl Add for Vec3 {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self {
-        Self(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
     }
 }
 
 impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
-        *self = Self(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2);
-    }
-}
-
-impl Sub for Vec3 {
-    type Output = Self;
-    fn sub(self, rhs: Self) -> Self {
-        Self(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
-    }
-}
-
-impl SubAssign for Vec3 {
-    fn sub_assign(&mut self, rhs: Self) {
-        *self = Self(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2);
+        *self = *self + rhs;
     }
 }
 
 impl Neg for Vec3 {
     type Output = Self;
+
     fn neg(self) -> Self::Output {
-        Self(-self.0, -self.1, -self.2)
+        Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self + -rhs
+    }
+}
+
+impl SubAssign for Vec3 {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self += -rhs;
     }
 }
 
 impl Mul for Vec3 {
     type Output = Self;
-    fn mul(self, rhs: Self) -> Self {
-        Self(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
     }
 }
 
 impl MulAssign for Vec3 {
     fn mul_assign(&mut self, rhs: Self) {
-        *self = Self(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2);
+        *self = *self * rhs;
     }
 }
 
 impl Mul<f64> for Vec3 {
     type Output = Self;
+
     fn mul(self, rhs: f64) -> Self::Output {
-        Self(self.0 * rhs, self.1 * rhs, self.2 * rhs)
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        }
     }
 }
 
 impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
-        *self = Self(self.0 * rhs, self.1 * rhs, self.2 * rhs);
+        *self = *self * rhs;
     }
 }
 
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
+
     fn mul(self, rhs: Vec3) -> Self::Output {
-        Vec3(self * rhs.0, self * rhs.1, self * rhs.2)
+        rhs * self
     }
 }
 
@@ -81,13 +106,13 @@ impl Div<f64> for Vec3 {
 
 impl DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
-        self.mul_assign(1. / rhs);
+        *self = *self / rhs;
     }
 }
 
 impl Vec3 {
     pub fn length_squared(&self) -> f64 {
-        self.0.powi(2) + self.1.powi(2) + self.2.powi(2)
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn length(&self) -> f64 {
@@ -95,75 +120,79 @@ impl Vec3 {
     }
 
     pub fn dot(self, rhs: Self) -> f64 {
-        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     pub fn cross(self, rhs: Self) -> Vec3 {
-        Vec3(self.1 * rhs.2 - self.2 * rhs.1,
-             self.2 * rhs.0 - self.0 * rhs.2,
-             self.0 * rhs.1 - self.1 * rhs.0)
+        Vec3 {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
     }
 
-    pub fn unit_vector(self: Vec3) -> Vec3 {
+    pub fn unit_vector(self) -> Vec3 {
         self / self.length()
     }
 
     pub fn is_near_zero(self) -> bool {
         let s = 1e-8;
-        (self.0.abs() < s) && (self.1.abs() < s) && (self.2.abs() < s)
+        (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
     }
 
     pub fn reflect(self, n: Vec3) -> Vec3 {
         self - 2.*self.dot(n)*n
     }
 
-    pub fn refract(self, n: Vec3, etai_over_etat: f64) -> Vec3 {
+    pub fn refract(self, n: Vec3, etai_over_etet: f64) -> Vec3 {
         let cos_theta = min_f64((-self).dot(n), 1.);
-        let r_out_perp = etai_over_etat * (self + cos_theta*n);
+        let r_out_perp = etai_over_etet * (self + cos_theta*n);
         let r_out_parallel = -((1.-r_out_perp.length_squared()).abs().sqrt()) * n;
         r_out_perp + r_out_parallel
     }
 
     pub fn new_random() -> Vec3 {
-        Vec3(random(), random(), random())
+        Vec3 {
+            x: random(),
+            y: random(),
+            z: random(),
+        }
     }
 
-    pub fn new_random_range(min: f64, max: f64) -> Vec3 {
-        Vec3(rand_f64(min, max), rand_f64(min, max), rand_f64(min, max))
+    pub fn new_random_in_range(min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            x: rand_f64(min, max),
+            y: rand_f64(min, max),
+            z: rand_f64(min, max),
+        }
     }
 
-    pub fn new_random_in_unit_sphere() -> Vec3 {
+    /// Generate a random Vector with length < 1
+    pub fn new_random_inside_unit_sphere() -> Vec3 {
         let mut p: Vec3;
         loop {
-            p = Vec3::new_random_range(-1., 1.);
+            p = Vec3::new_random_in_range(-1., 1.);
             if p.length_squared() < 1. { break }
         }
         p
     }
 
-    pub fn new_random_in_hemisphere(normal: Vec3) -> Vec3 {
-        let in_unit_sphere = Vec3::new_random_in_unit_sphere();
-        if in_unit_sphere.dot(normal) > 0. {
-            in_unit_sphere
+    pub fn new_random_inside_hemisphere(normal: Vec3) -> Vec3 {
+        let v = Vec3::new_random_inside_unit_sphere();
+        if v.dot(normal) > 0. {
+            v
         }
         else {
-            -in_unit_sphere
+            -v
         }
     }
 
+    /// Generate a random Vector with length = 1
     pub fn new_random_unit_vector() -> Vec3 {
-        Vec3::new_random_in_unit_sphere().unit_vector()
+        Vec3::new_random_inside_unit_sphere().unit_vector()
     }
 
-    pub fn x(self) -> f64 {
-        self.0
-    }
-
-    pub fn y(self) -> f64 {
-        self.1
-    }
-
-    pub fn z(self) -> f64 {
-        self.2
-    }
 }
+
+pub type Point3 = Vec3;
+pub type Color = Vec3;
