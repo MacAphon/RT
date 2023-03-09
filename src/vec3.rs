@@ -1,7 +1,7 @@
-use std::cmp::*;
 use crate::util::*;
-use std::ops::*;
 use rand::random;
+use std::cmp::*;
+use std::ops::*;
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq)]
 pub struct Vec3 {
@@ -141,13 +141,13 @@ impl Vec3 {
     }
 
     pub fn reflect(self, n: Vec3) -> Vec3 {
-        self - 2.*self.dot(n)*n
+        self - 2. * self.dot(n) * n
     }
 
     pub fn refract(self, n: Vec3, etai_over_etet: f64) -> Vec3 {
         let cos_theta = min_f64((-self).dot(n), 1.);
-        let r_out_perp = etai_over_etet * (self + cos_theta*n);
-        let r_out_parallel = -((1.-r_out_perp.length_squared()).abs().sqrt()) * n;
+        let r_out_perp = etai_over_etet * (self + cos_theta * n);
+        let r_out_parallel = -((1. - r_out_perp.length_squared()).abs().sqrt()) * n;
         r_out_perp + r_out_parallel
     }
 
@@ -172,7 +172,9 @@ impl Vec3 {
         let mut p: Vec3;
         loop {
             p = Vec3::new_random_in_range(-1., 1.);
-            if p.length_squared() < 1. { break }
+            if p.length_squared() < 1. {
+                break;
+            }
         }
         p
     }
@@ -181,8 +183,7 @@ impl Vec3 {
         let v = Vec3::new_random_inside_unit_sphere();
         if v.dot(normal) > 0. {
             v
-        }
-        else {
+        } else {
             -v
         }
     }
@@ -191,7 +192,6 @@ impl Vec3 {
     pub fn new_random_unit_vector() -> Vec3 {
         Vec3::new_random_inside_unit_sphere().unit_vector()
     }
-
 }
 
 pub type Point3 = Vec3;

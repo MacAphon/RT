@@ -1,51 +1,56 @@
 mod hittable;
 mod material;
-mod vec3;
 mod util;
+mod vec3;
 
-use std::path::PathBuf;
 use clap::Parser;
-use image;
+use std::path::PathBuf;
 
-const DEFAULT_PATH: &str = "out.png";
-const DEFAULT_HEIGHT: usize = 256;
-const DEFAULT_WIDTH: usize = 341;
+const DEFAULT_PATH: &str = "output/out.png";
+const DEFAULT_HEIGHT: u32 = 256;
+const DEFAULT_WIDTH: u32 = 341; // 4/3
 const DEFAULT_SAMPLES: usize = 50;
 
 #[derive(Parser)]
 struct Cli {
-    /// Output file, default is out.png
-    #[arg(short, long)]
-    write: Option<PathBuf>,
+    /// Output file
+    #[arg(short, long, default_value_t=DEFAULT_PATH.into())]
+    write: String,
 
-    /// Height of the rendered image, default is 256
-    #[arg(short, long)]
-    height: Option<usize>,
+    /// Height of the rendered image
+    #[arg(short='H', long, default_value_t=DEFAULT_HEIGHT)]
+    height: u32,
 
-    /// Width of the rendered image, default is 341
-    #[arg(long, short)]
-    width: Option<usize>,
+    /// Width of the rendered image
+    #[arg(short='W', long, default_value_t=DEFAULT_WIDTH)]
+    width: u32,
 
-    /// Number of samples per Pixel, default is 50
-    /// A higher number means higher image quality, but also higher calculation times.
-    #[arg(long, short)]
-    samples: Option<usize>
+    /// Number of samples per Pixel.
+    /// A higher number means higher image quality, but also increased rendering times.
+    #[arg(short, long, default_value_t=DEFAULT_SAMPLES)]
+    samples: usize,
 }
 
 fn main() -> Result<(), ()> {
     let cli = Cli::parse();
 
-    let out_path: PathBuf = match cli.write {
-        Some(path) => path,
-        None => DEFAULT_PATH.parse().unwrap(),
-    };
+    let out_path: PathBuf = cli.write.into();
+    let height: u32 = cli.height;
+    let width: u32 = cli.width;
+    let samples: usize = cli.samples;
 
-    let height: usize = match cli.height {
-        Some(height) => height,
-        None => DEFAULT_HEIGHT,
-    };
+    let mut imgbuf = image::ImageBuffer::new(width, height);
 
+    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+        let r = (255. * x as f64 / width as f64) as u8;
+        let g = (255. * y as f64 / height as f64) as u8;
+        *pixel = image::Rgb([r, g, 0]);
+    }
 
+    match imgbuf.save(out_path) {
+        Ok(_) => {},
+        Err(e) => eprintln!("{}", e),
+    }
 
     Ok(())
 }

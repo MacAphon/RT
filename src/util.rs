@@ -2,9 +2,13 @@ use float_ord::sort;
 use rand::random;
 
 pub fn clamp<T: PartialOrd>(v: T, min: T, max: T) -> T {
-    if v < min { min }
-    else if v > max { max }
-    else { v }
+    if v < min {
+        min
+    } else if v > max {
+        max
+    } else {
+        v
+    }
 }
 
 /// Returns a random value in the range [min, max)
