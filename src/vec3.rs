@@ -151,6 +151,10 @@ impl Vec3 {
         r_out_perp + r_out_parallel
     }
 
+    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 { x, y, z, }
+    }
+
     pub fn new_random() -> Vec3 {
         Vec3 {
             x: random(),
@@ -195,4 +199,20 @@ impl Vec3 {
 }
 
 pub type Point3 = Vec3;
+
 pub type Color = Vec3;
+
+impl Default for Color {
+    fn default() -> Self {
+        Color::new(1., 0., 1.)
+    }
+}
+
+impl Color {
+    pub fn to_rgb_pixel(self) -> image::Rgb<u8> {
+        let r: u8 = (255. * self.x) as u8;
+        let g: u8 = (255. * self.y) as u8;
+        let b: u8 = (255. * self.z) as u8;
+        image::Rgb([r, g, b])
+    }
+}

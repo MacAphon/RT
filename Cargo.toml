@@ -1,5 +1,5 @@
 [package]
-name = "RT"
+name = "Raydiator"
 description = "A Ray Tracer, following 'Ray Tracing in One Weekend'"
 version = "0.2.0"
 edition = "2021"
