@@ -1,5 +1,10 @@
 use float_ord::sort;
 use rand::random;
+use std::io;
+use std::io::Write;
+use png::Compression::Default;
+use crate::hittable::hittable_list::HittableList;
+use crate::hittable::sphere::Sphere;
 
 pub fn clamp<T: PartialOrd>(v: T, min: T, max: T) -> T {
     if v < min {
@@ -22,3 +27,37 @@ pub fn min_f64(x: f64, y: f64) -> f64 {
     sort(&mut t);
     t[0]
 }
+
+/// Draw a simple progress bar to stderr, writing over the current line.\
+/// Example output:\
+/// 0.0 -> `\r  0% [                                        ]`\
+/// 0.5 -> `\r 50% [====================                    ]`\
+/// 1.0 -> `\r100% [========================================]`
+pub fn print_progress<T: Into<f64>>(progress: T, max: T) {
+    let progress: f64 = progress.into() / max.into();
+    let progress_number: String = (progress * 100.).round().to_string();
+    let number_padding: String = " ".repeat(3 - progress_number.len());
+    let progress_bar: String = "=".repeat((progress * 40.).round() as usize);
+    let bar_padding: String = " ".repeat(40 - progress_bar.len());
+
+    io::stderr()
+        .write_all(
+            format!(
+                "\r{}{}% [{}{}]",
+                number_padding, progress_number, progress_bar, bar_padding
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+    io::stderr().flush().unwrap();
+}
+
+/*pub fn build_world() -> HittableList {
+    let mut list: HittableList = Default::default();
+
+    list.add(
+        Sphere::ne
+    )
+
+    list
+}*/

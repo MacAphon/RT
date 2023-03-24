@@ -1,7 +1,7 @@
 [package]
-name = "Raydiator"
+name = "raydiator"
 description = "A Ray Tracer, following 'Ray Tracing in One Weekend'"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Christian Korn <c.a.konr@gmx.de>"]
 repository = "https://github.com/MacAphon/RT"
