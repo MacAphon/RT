@@ -6,15 +6,15 @@ mod util;
 mod vec3;
 
 use crate::camera::Camera;
+use crate::hittable::hittable_list::HittableList;
+use crate::hittable::sphere::Sphere;
+use crate::material::metal::Metal;
+use crate::ray::Ray;
 use crate::util::print_progress;
 use crate::vec3::{Color, Point3, Vec3};
 use clap::Parser;
+use rand::random;
 use std::path::PathBuf;
-use std::thread::sleep;
-use std::time::Duration;
-use crate::hittable::hittable_list::HittableList;
-use crate::hittable::sphere::Sphere;
-use crate::ray::Ray;
 
 const DEFAULT_PATH: &str = "output/out.png";
 const DEFAULT_HEIGHT: u32 = 256;
@@ -90,24 +90,28 @@ fn main() -> Result<(), ()> {
 
     let mut world: HittableList = HittableList::new();
 
-    world.add(
-        Box::new(Sphere {
-            center: Point3 {
-                x: 0.,
-                y: 0.,
-                z: -2.,
-            },
-            radius: 1.,
-        })
-    );
+    world.add(Box::new(Sphere {
+        center: Point3::new(0., 0., -2.),
+        radius: 1.,
+        material: Box::new(Metal::new(Color::new_color(0.8, 0.1, 0.2), 0.0)),
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(0., -101., -2.),
+        radius: 100.,
+        material: Box::new(Metal::new(Color::new_color(0.1, 0.8, 0.5), 0.5)),
+    }));
+
 
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let u: f64 = (width - x) as f64 / width as f64;
-        let v: f64 = (height - y) as f64 / height as f64;
-
         let mut col: Color = Color::new(0., 0., 0.);
-        let ray: Ray = cam.get_ray(u, v);
-        col += ray.ray_color(&world, 1);
+
+        for _ in 0..samples {
+            let u: f64 = ((width - x) as f64 + random::<f64>()) / width as f64;
+            let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
+
+            let ray: Ray = cam.get_ray(u, v);
+            col += ray.ray_color(&world, 16) / samples as f64;
+        }
         *pixel = col.to_rgb_pixel();
 
         print_progress(y * width + x, width * height)
@@ -122,8 +126,8 @@ fn main() -> Result<(), ()> {
         Ok(_) => {}
         Err(e) => {
             eprintln!("{}", e);
-            return Err(())
-        },
+            return Err(());
+        }
     }
 
     Ok(())

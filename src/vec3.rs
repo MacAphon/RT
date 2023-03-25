@@ -215,4 +215,22 @@ impl Color {
         let b: u8 = (255. * self.z) as u8;
         image::Rgb([r, g, b])
     }
+
+    pub fn new_color(r: f64, g: f64, b: f64) -> Color {
+        Color {
+            x: r,
+            y: b,
+            z: g,
+        }
+    }
+
+    pub fn r(&self) -> f64 {
+        self.x
+    }
+    pub fn g(&self) -> f64 {
+        self.y
+    }
+    pub fn b(&self) -> f64 {
+        self.z
+    }
 }

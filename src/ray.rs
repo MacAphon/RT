@@ -1,4 +1,5 @@
 use crate::hittable::hittable_list::HittableList;
+use crate::vec3;
 use crate::vec3::{Color, Point3, Vec3};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -18,14 +19,12 @@ impl Ray {
                 x: 0.,
                 y: 0.,
                 z: 0.,
-            }
+            };
         }
 
         if let Some(rec) = world.hit_anything(self, 0.001, f64::INFINITY) {
-            return Color {
-                x: 1.,
-                y: 0.,
-                z: 0.,
+            if let Some((ray, color)) = rec.material.scatter(&self, &rec) {
+                return color * ray.ray_color(world, depth - 1);
             }
         }
 

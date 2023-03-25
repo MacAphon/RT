@@ -1,7 +1,9 @@
+use crate::material::Material;
 use crate::vec3::{Point3, Vec3};
 
-pub struct HitRecord {
-    pub(crate) pos: Point3,
-    pub(crate) normal: Vec3,
-    pub(crate) t: f64,
+pub struct HitRecord<'a> {
+    pub pos: Point3,
+    pub normal: Vec3,
+    pub t: f64,
+    pub material: &'a Box<dyn Material>,
 }
