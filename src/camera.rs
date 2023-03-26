@@ -6,8 +6,6 @@ pub struct Camera {
     lower_left_corner: Vec3,
     horizontal: Vec3,
     vertical: Vec3,
-    viewport_width: f64,
-    viewport_height: f64,
 }
 
 impl Camera {
@@ -38,8 +36,6 @@ impl Camera {
             lower_left_corner,
             horizontal,
             vertical,
-            viewport_width,
-            viewport_height,
         }
     }
 

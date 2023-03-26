@@ -3,7 +3,7 @@ use crate::ray::Ray;
 use crate::vec3::Color;
 
 pub mod metal;
-pub mod lambertian;
+pub mod diffuse;
 pub mod dielectric;
 
 pub trait Material {

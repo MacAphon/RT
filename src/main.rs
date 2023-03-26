@@ -7,37 +7,24 @@ mod vec3;
 
 use crate::camera::Camera;
 use crate::hittable::hittable_list::HittableList;
-use crate::hittable::sphere::Sphere;
-use crate::material::metal::Metal;
 use crate::ray::Ray;
 use crate::util::print_progress;
 use crate::vec3::{Color, Point3, Vec3};
 use clap::Parser;
 use rand::random;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 const DEFAULT_PATH: &str = "output/out.png";
 const DEFAULT_HEIGHT: u32 = 256;
 const DEFAULT_WIDTH: u32 = 341; // 4/3 * 256
-const DEFAULT_SAMPLES: usize = 50;
+const DEFAULT_SAMPLES: usize = 100;
 const DEFAULT_DEPTH: usize = 16;
 
-const CAMERA_ORIGIN: Point3 = Point3 {
-    x: 0.,
-    y: 0.,
-    z: 0.,
-};
-const CAMERA_TARGET: Point3 = Point3 {
-    x: 0.,
-    y: 0.,
-    z: -2.,
-};
-const V_UP: Vec3 = Vec3 {
-    x: 0.,
-    y: 1.,
-    z: 0.,
-};
-const V_FOV: f64 = 90.;
+const CAMERA_ORIGIN: Point3 = Point3::new(-4., 1., 0.);
+const CAMERA_TARGET: Point3 = Point3::new(0., 0., -2.);
+const V_UP: Vec3 = Vec3::new(0., 1., 0.);
+const V_FOV: f64 = 15.; // FOV in the vertical axis
 
 #[derive(Parser)]
 struct Cli {
@@ -88,31 +75,19 @@ fn main() -> Result<(), ()> {
         V_FOV,
     );
 
-    let mut world: HittableList = HittableList::new();
-
-    world.add(Box::new(Sphere {
-        center: Point3::new(0., 0., -2.),
-        radius: 1.,
-        material: Box::new(Metal::new(Color::new_color(0.8, 0.1, 0.2), 0.0)),
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(0., -101., -2.),
-        radius: 100.,
-        material: Box::new(Metal::new(Color::new_color(0.1, 0.8, 0.5), 0.5)),
-    }));
-
+    let world: Arc<HittableList> = Arc::new(hittable::hittable_list::generate_world());
 
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let mut col: Color = Color::new(0., 0., 0.);
 
         for _ in 0..samples {
-            let u: f64 = ((width - x) as f64 + random::<f64>()) / width as f64;
+            let u: f64 = (x as f64 + random::<f64>()) / width as f64;
             let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
 
             let ray: Ray = cam.get_ray(u, v);
-            col += ray.ray_color(&world, 16) / samples as f64;
+            col += ray.ray_color(&world, 16);
         }
-        *pixel = col.to_rgb_pixel();
+        *pixel = col.to_rgb_pixel(samples);
 
         print_progress(y * width + x, width * height)
     }

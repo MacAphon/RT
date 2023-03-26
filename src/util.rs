@@ -1,7 +1,4 @@
-use crate::hittable::hittable_list::HittableList;
-use crate::hittable::sphere::Sphere;
 use float_ord::sort;
-use png::Compression::Default;
 use rand::random;
 use std::io;
 use std::io::Write;

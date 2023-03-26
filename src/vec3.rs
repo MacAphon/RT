@@ -151,7 +151,7 @@ impl Vec3 {
         r_out_perp + r_out_parallel
     }
 
-    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+    pub const fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 { x, y, z }
     }
 
@@ -209,18 +209,18 @@ impl Default for Color {
 }
 
 impl Color {
-    pub fn to_rgb_pixel(self) -> image::Rgb<u8> {
-        let r: u8 = (255. * self.x) as u8;
-        let g: u8 = (255. * self.y) as u8;
-        let b: u8 = (255. * self.z) as u8;
+    pub fn to_rgb_pixel(self, samples: usize) -> image::Rgb<u8> {
+        let r: u8 = (255. * (self.x / samples as f64).sqrt()) as u8;
+        let g: u8 = (255. * (self.y / samples as f64).sqrt()) as u8;
+        let b: u8 = (255. * (self.z / samples as f64).sqrt()) as u8;
         image::Rgb([r, g, b])
     }
 
-    pub fn new_color(r: f64, g: f64, b: f64) -> Color {
+    pub const fn new_color(r: f64, g: f64, b: f64) -> Color {
         Color {
             x: r,
-            y: b,
-            z: g,
+            y: g,
+            z: b,
         }
     }
 
@@ -233,4 +233,7 @@ impl Color {
     pub fn b(&self) -> f64 {
         self.z
     }
+
+    pub const BLACK: Color = Color::new_color(0., 0., 0.);
+    pub const WHITE: Color = Color::new_color(1., 1., 1.);
 }

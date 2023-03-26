@@ -1,6 +1,11 @@
 use crate::hittable::hit_record::HitRecord;
 use crate::hittable::Hittable;
+use crate::hittable::sphere::Sphere;
+use crate::material::dielectric::Dielectric;
+use crate::material::diffuse::Diffuse;
+use crate::material::metal::Metal;
 use crate::ray::Ray;
+use crate::vec3::{Color, Point3};
 
 #[derive(Default)]
 pub struct HittableList {
@@ -34,4 +39,36 @@ impl HittableList {
         }
         rec
     }
+}
+
+pub fn generate_world() -> HittableList {
+    let mut world: HittableList = HittableList::new();
+
+    world.add(Box::new(Sphere {
+        center: Point3::new(0., 0., -2.),
+        radius: 0.499,
+        material: Box::new(Metal::new(Color::new_color(0.65, 0.02, 0.08), 0.0)),
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(-1., 0., -2.),
+        radius: 0.499,
+        material: Box::new(Dielectric::new_clear(1.5)),
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(-1., 0., -2.),
+        radius: -0.47,
+        material: Box::new(Dielectric::new_clear(1.5)),
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(1., 0., -2.),
+        radius: 0.499,
+        material: Box::new(Metal::new(Color::new_color(0.5, 0.8, 0.55), 1.)),
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(0., -1000.5, -2.),
+        radius: 1000.,
+        material: Box::new(Diffuse::new(Color::new_color(0.1, 0.05, 0.5))),
+    }));
+
+    world
 }
