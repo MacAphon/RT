@@ -21,10 +21,12 @@ const DEFAULT_WIDTH: u32 = 341; // 4/3 * 256
 const DEFAULT_SAMPLES: usize = 100;
 const DEFAULT_DEPTH: usize = 16;
 
-const CAMERA_ORIGIN: Point3 = Point3::new(-4., 1., 0.);
-const CAMERA_TARGET: Point3 = Point3::new(0., 0., -2.);
+const CAMERA_ORIGIN: Point3 = Point3::new(13., 2., 3.);
+const CAMERA_TARGET: Point3 = Point3::new(0., 0., 0.);
 const V_UP: Vec3 = Vec3::new(0., 1., 0.);
 const V_FOV: f64 = 15.; // FOV in the vertical axis
+const APERTURE: f64 = 0.2;
+const FOCUS_DIST: f64 = 10.;
 
 #[derive(Parser)]
 struct Cli {
@@ -73,6 +75,8 @@ fn main() -> Result<(), ()> {
         V_UP,
         width as f64 / height as f64,
         V_FOV,
+        APERTURE,
+        FOCUS_DIST,
     );
 
     let world: Arc<HittableList> = Arc::new(hittable::hittable_list::generate_world());

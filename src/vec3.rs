@@ -136,7 +136,7 @@ impl Vec3 {
     }
 
     pub fn is_near_zero(self) -> bool {
-        let s = 1e-8;
+        let s: f64 = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
     }
 
@@ -192,6 +192,16 @@ impl Vec3 {
         }
     }
 
+    pub fn new_random_in_unit_disk() -> Vec3 {
+        loop {
+            let p: Vec3 = Vec3::new(rand_f64(-1., 1.), rand_f64(-1., 1.), 0.);
+            if p.length_squared() >= 1. {
+                continue;
+            }
+            return p;
+        }
+    }
+
     /// Generate a random Vector with length = 1
     pub fn new_random_unit_vector() -> Vec3 {
         Vec3::new_random_inside_unit_sphere().unit_vector()
@@ -217,11 +227,7 @@ impl Color {
     }
 
     pub const fn new_color(r: f64, g: f64, b: f64) -> Color {
-        Color {
-            x: r,
-            y: g,
-            z: b,
-        }
+        Color { x: r, y: g, z: b }
     }
 
     pub fn r(&self) -> f64 {
