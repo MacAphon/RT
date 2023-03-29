@@ -3,7 +3,6 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Color, Vec3};
 
-#[derive(Clone)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,

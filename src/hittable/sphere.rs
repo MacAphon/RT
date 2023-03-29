@@ -4,8 +4,6 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-//#[derive(Clone)]
-#[derive(Clone)]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,

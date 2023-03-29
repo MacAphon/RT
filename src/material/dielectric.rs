@@ -5,7 +5,6 @@ use crate::util::min_f64;
 use crate::vec3::{Color, Vec3};
 use rand::random;
 
-#[derive(Clone)]
 pub struct Dielectric {
     ir: f64,
     attenuation: Color,
