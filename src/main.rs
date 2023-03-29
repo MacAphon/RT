@@ -14,6 +14,8 @@ use clap::Parser;
 use rand::random;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::thread;
+use image::Rgb;
 
 const DEFAULT_PATH: &str = "output/out.png";
 const DEFAULT_HEIGHT: u32 = 256;
@@ -25,7 +27,7 @@ const CAMERA_ORIGIN: Point3 = Point3::new(13., 2., 3.);
 const CAMERA_TARGET: Point3 = Point3::new(0., 0., 0.);
 const V_UP: Vec3 = Vec3::new(0., 1., 0.);
 const V_FOV: f64 = 15.; // FOV in the vertical axis
-const APERTURE: f64 = 0.2;
+const APERTURE: f64 = 0.1;
 const FOCUS_DIST: f64 = 10.;
 
 #[derive(Parser)]
@@ -67,8 +69,6 @@ fn main() -> Result<(), ()> {
     eprintln!("- {} samples per pixel", samples);
     eprintln!("- up to {} bounces per sample\n", max_depth);
 
-    let mut imgbuf = image::ImageBuffer::new(width, height);
-
     let cam: Camera = Camera::new(
         CAMERA_ORIGIN,
         CAMERA_TARGET,
@@ -81,25 +81,49 @@ fn main() -> Result<(), ()> {
 
     let world: Arc<HittableList> = Arc::new(hittable::hittable_list::generate_world());
 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let mut col: Color = Color::new(0., 0., 0.);
+    let mut children = vec![];
+    let mut finished: usize = 0;
+    print_progress(finished as u32, height);
 
-        for _ in 0..samples {
-            let u: f64 = (x as f64 + random::<f64>()) / width as f64;
-            let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
+    for y in 0..height {
+        let world_cl = world.clone();
+        children.push(thread::spawn(move || -> Vec<Rgb<u8>> {
+            let mut pixels: Vec<Rgb<u8>> = Vec::with_capacity(width as usize);
+            
+            for x in 0..width {
+                let mut col: Color = Color::new(0., 0., 0.);
 
-            let ray: Ray = cam.get_ray(u, v);
-            col += ray.ray_color(&world, 16);
-        }
-        *pixel = col.to_rgb_pixel(samples);
+                for _ in 0..samples {
+                    let u: f64 = (x as f64 + random::<f64>()) / width as f64;
+                    let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
 
-        print_progress(y * width + x, width * height)
+                    let ray: Ray = cam.get_ray(u, v);
+                    col += ray.ray_color(&world_cl, 16);
+                }
+                pixels.push(col.to_rgb_pixel(samples));
+            }
+            pixels
+        }))
     }
 
-    /*    for i in 0..101 {
-        print_progress(i, 100);
-        sleep(Duration::from_millis(100));
-    }*/
+    let mut image = Vec::with_capacity(height as usize);
+
+    for child in children {
+        let x = child.join().unwrap();
+        image.push(x);
+        finished += 1;
+        print_progress(finished as u32, height);
+    }
+
+    eprintln!("\nDone.");
+
+    let mut imgbuf = image::ImageBuffer::new(width, height);
+
+    for (y, row) in image.iter().enumerate() {
+        for (x, pixel) in row.iter().enumerate() {
+            imgbuf.put_pixel(x as u32, y as u32, pixel.to_owned())
+        }
+    }
 
     match imgbuf.save(out_path) {
         Ok(_) => {}

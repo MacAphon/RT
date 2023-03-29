@@ -242,4 +242,5 @@ impl Color {
 
     pub const BLACK: Color = Color::new_color(0., 0., 0.);
     pub const WHITE: Color = Color::new_color(1., 1., 1.);
+    pub const ERROR: Color = Color::new_color(1., 0., 1.);
 }

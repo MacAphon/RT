@@ -27,9 +27,9 @@ pub fn min_f64(x: f64, y: f64) -> f64 {
 
 /// Draw a simple progress bar to stderr, writing over the current line.\
 /// Example output:\
-/// 0.0 -> `\r  0% [                                        ]`\
-/// 0.5 -> `\r 50% [====================                    ]`\
-/// 1.0 -> `\r100% [========================================]`
+/// ` 0,   5 -> \r  0% [                                        ]`\
+/// `77, 154 -> \r 50% [====================                    ]`\
+/// `13,  13 -> \r100% [========================================]`
 pub fn print_progress<T: Into<f64>>(progress: T, max: T) {
     let progress: f64 = progress.into() / max.into();
     let progress_number: String = (progress * 100.).round().to_string();

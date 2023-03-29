@@ -3,9 +3,13 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Color, Vec3};
 
+#[derive(Clone)]
 pub struct Diffuse {
     albedo: Color,
 }
+
+unsafe impl Send for Diffuse {}
+unsafe impl Sync for Diffuse {}
 
 impl Material for Diffuse {
     fn scatter(&self, _r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
@@ -32,4 +36,3 @@ impl Diffuse {
         Diffuse { albedo }
     }
 }
-

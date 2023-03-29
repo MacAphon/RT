@@ -3,10 +3,14 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Color, Vec3};
 
+#[derive(Clone)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
 }
+
+unsafe impl Send for Metal {}
+unsafe impl Sync for Metal {}
 
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
@@ -27,9 +31,6 @@ impl Material for Metal {
 
 impl Metal {
     pub fn new(albedo: Color, fuzz: f64) -> Metal {
-        Metal {
-            albedo,
-            fuzz,
-        }
+        Metal { albedo, fuzz }
     }
 }

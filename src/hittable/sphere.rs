@@ -5,11 +5,15 @@ use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
 //#[derive(Clone)]
+#[derive(Clone)]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
     pub material: Box<dyn Material>,
 }
+
+unsafe impl Send for Sphere {}
+unsafe impl Sync for Sphere {}
 
 impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {

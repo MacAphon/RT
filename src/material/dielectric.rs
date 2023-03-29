@@ -5,10 +5,14 @@ use crate::util::min_f64;
 use crate::vec3::{Color, Vec3};
 use rand::random;
 
+#[derive(Clone)]
 pub struct Dielectric {
     ir: f64,
     attenuation: Color,
 }
+
+unsafe impl Send for Dielectric {}
+unsafe impl Sync for Dielectric {}
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
@@ -34,7 +38,10 @@ impl Material for Dielectric {
             unit_direction.refract(record.normal, refraction_ratio)
         };
 
-        let scattered = Ray{ origin: record.pos, direction };
+        let scattered = Ray {
+            origin: record.pos,
+            direction,
+        };
 
         Some((scattered, self.attenuation))
     }
@@ -42,10 +49,7 @@ impl Material for Dielectric {
 
 impl Dielectric {
     pub fn new(ir: f64, attenuation: Color) -> Dielectric {
-        Dielectric {
-            ir,
-            attenuation
-        }
+        Dielectric { ir, attenuation }
     }
 
     pub fn new_clear(ir: f64) -> Dielectric {

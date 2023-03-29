@@ -1,6 +1,7 @@
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
+#[derive(Copy, Clone)]
 pub struct Camera {
     origin: Point3,
     lower_left_corner: Vec3,
@@ -9,7 +10,7 @@ pub struct Camera {
     u: Vec3,
     v: Vec3,
     w: Vec3,
-    lens_radius: f64
+    lens_radius: f64,
 }
 
 impl Camera {
@@ -44,7 +45,9 @@ impl Camera {
             lower_left_corner,
             horizontal,
             vertical,
-            w, u, v,
+            w,
+            u,
+            v,
             lens_radius,
         }
     }
@@ -55,7 +58,8 @@ impl Camera {
         Ray {
             origin: self.origin + offset,
             direction: self.lower_left_corner + s * self.horizontal + t * self.vertical
-                - self.origin - offset,
+                - self.origin
+                - offset,
         }
     }
 }

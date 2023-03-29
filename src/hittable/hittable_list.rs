@@ -9,7 +9,7 @@ use crate::ray::Ray;
 use crate::vec3::{Color, Point3};
 use rand::random;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
 }
