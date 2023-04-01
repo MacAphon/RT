@@ -1,4 +1,3 @@
-use float_ord::sort;
 use rand::random;
 use std::io;
 use std::io::Write;
@@ -20,9 +19,11 @@ pub fn rand_f64(min: f64, max: f64) -> f64 {
 }
 
 pub fn min_f64(x: f64, y: f64) -> f64 {
-    let mut t = vec![x, y];
-    sort(&mut t);
-    t[0]
+    if x < y {
+        x
+    } else {
+        y
+    }
 }
 
 /// Draw a simple progress bar to stderr, writing over the current line.\

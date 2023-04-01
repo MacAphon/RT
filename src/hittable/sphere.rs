@@ -39,3 +39,13 @@ impl Hittable for Sphere {
         Some(HitRecord::new(r, pos, root, &self.material, outward_normal))
     }
 }
+
+impl Sphere {
+    pub fn new(center: Point3, radius: f64, material: Box<dyn Material>) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
+    }
+}

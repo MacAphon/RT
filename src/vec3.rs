@@ -144,9 +144,9 @@ impl Vec3 {
         self - 2. * self.dot(n) * n
     }
 
-    pub fn refract(self, n: Vec3, etai_over_etet: f64) -> Vec3 {
+    pub fn refract(self, n: Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = min_f64((-self).dot(n), 1.);
-        let r_out_perp = etai_over_etet * (self + cos_theta * n);
+        let r_out_perp = etai_over_etat * (self + cos_theta * n);
         let r_out_parallel = -((1. - r_out_perp.length_squared()).abs().sqrt()) * n;
         r_out_perp + r_out_parallel
     }
