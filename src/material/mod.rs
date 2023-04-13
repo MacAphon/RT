@@ -9,3 +9,11 @@ pub mod metal;
 pub trait Material: Send + Sync {
     fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)>;
 }
+
+pub struct DefaultMaterial {}
+
+impl Material for DefaultMaterial {
+    fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
+        None
+    }
+}

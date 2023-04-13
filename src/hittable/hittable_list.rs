@@ -1,3 +1,5 @@
+use std::rc::Rc;
+use std::sync::Arc;
 use crate::hittable::hit_record::HitRecord;
 use crate::hittable::sphere::Sphere;
 use crate::hittable::Hittable;
@@ -30,17 +32,17 @@ impl HittableList {
         self.objects.push(rhs);
     }
 
-    pub fn hit_anything(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    pub fn hit_anything(&self, r: &Ray, rec: &mut HitRecord, t_min: f64, t_max: f64) -> bool {
         let mut closest_so_far: f64 = t_max;
-        let mut rec: Option<HitRecord> = None;
+        let mut has_hit = false;
 
         for element in &self.objects {
-            if let Some(temp_r) = element.hit(r, t_min, closest_so_far) {
-                closest_so_far = temp_r.t;
-                rec = Some(temp_r);
+            if element.hit(r, t_min, closest_so_far, rec) {
+                closest_so_far = rec.t;
+                has_hit = true
             }
         }
-        rec
+        has_hit
     }
 }
 
@@ -50,7 +52,7 @@ pub fn generate_world() -> HittableList {
     world.add(Box::new(Sphere {
         center: Point3::new(0., -1000., 0.),
         radius: 1000.,
-        material: Box::new(Diffuse::new(Color::new_color(0.5, 0.5, 0.5))),
+        material: Arc::new(Box::new(Diffuse::new(Color::new_color(0.5, 0.5, 0.5)))),
     }));
 
     let mut rng = StdRng::from_seed([6; 32]);
@@ -86,7 +88,7 @@ pub fn generate_world() -> HittableList {
                 world.add(Box::new(Sphere {
                     center,
                     radius: 0.2,
-                    material: mat,
+                    material: Arc::new(mat),
                 }))
             }
         }
@@ -95,22 +97,22 @@ pub fn generate_world() -> HittableList {
     world.add(Box::new(Sphere {
         center: Point3::new(0., 1., 0.),
         radius: 1.,
-        material: Box::new(Dielectric::new_clear(1.5)),
+        material: Arc::new(Box::new(Dielectric::new_clear(1.5))),
     }));
     world.add(Box::new(Sphere {
         center: Point3::new(0., 1., 0.),
         radius: -0.95,
-        material: Box::new(Dielectric::new_clear(1.5)),
+        material: Arc::new(Box::new(Dielectric::new_clear(1.5))),
     }));
     world.add(Box::new(Sphere {
         center: Point3::new(-4., 1., 0.),
         radius: 1.,
-        material: Box::new(Diffuse::new(Color::new_color(0.4, 0.2, 0.1))),
+        material: Arc::new(Box::new(Diffuse::new(Color::new_color(0.4, 0.2, 0.1)))),
     }));
     world.add(Box::new(Sphere {
         center: Point3::new(4., 1., 0.),
         radius: 1.,
-        material: Box::new(Metal::new(Color::new_color(0.7, 0.6, 0.5), 0.)),
+        material: Arc::new(Box::new(Metal::new(Color::new_color(0.7, 0.6, 0.5), 0.))),
     }));
 
     /*    world.add(Box::new(Sphere {

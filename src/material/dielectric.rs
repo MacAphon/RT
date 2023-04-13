@@ -1,7 +1,7 @@
 use crate::hittable::hit_record::HitRecord;
 use crate::material::Material;
 use crate::ray::Ray;
-use crate::util::min_f64;
+use crate::util::min_v;
 use crate::vec3::{Color, Vec3};
 use rand::random;
 
@@ -22,7 +22,7 @@ impl Material for Dielectric {
         };
         let unit_direction: Vec3 = r_in.direction.unit_vector();
 
-        let cos_theta: f64 = min_f64((-unit_direction).dot(record.normal), 1.);
+        let cos_theta: f64 = min_v((-unit_direction).dot(record.normal), 1.);
         let sin_theta: f64 = (1. - cos_theta.powi(2)).sqrt();
 
         let cannot_refract: bool = refraction_ratio * sin_theta > 1.;

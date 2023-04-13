@@ -4,7 +4,8 @@ use crate::ray::Ray;
 pub mod hit_record;
 pub mod hittable_list;
 pub mod sphere;
+mod aabb;
 
 pub trait Hittable: Send + Sync {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }

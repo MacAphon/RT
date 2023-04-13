@@ -16,6 +16,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::thread;
 use image::Rgb;
+use crate::hittable::hit_record::HitRecord;
 
 const DEFAULT_PATH: &str = "output/out.png";
 const DEFAULT_HEIGHT: u32 = 256;
@@ -98,7 +99,9 @@ fn main() -> Result<(), ()> {
                     let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
 
                     let ray: Ray = cam.get_ray(u, v);
-                    col += ray.ray_color(&world_cl, 16);
+
+                    let mut rec: HitRecord = HitRecord::new_default();
+                    col += ray.ray_color(&mut rec, &world_cl, 16);
                 }
                 pixels.push(col.to_rgb_pixel(samples));
             }
