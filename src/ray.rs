@@ -1,5 +1,5 @@
-use crate::hittable::hit_record::HitRecord;
 use crate::hittable::hittable_list::HittableList;
+use crate::material;
 use crate::vec3::{Color, Point3, Vec3};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -13,14 +13,14 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn ray_color(&self, rec: &mut HitRecord, world: &HittableList, depth: usize) -> Color {
+    pub fn ray_color(&self, world: &HittableList, depth: usize) -> Color {
         if depth == 0 {
             return Color::BLACK;
         }
 
-        if world.hit_anything(self, rec, 0.001, f64::INFINITY) {
-            return if let Some((ray, color)) = rec.material.scatter(self, &rec) {
-                color * ray.ray_color(rec, world, depth - 1)
+        if let Some(rec) = world.hit_anything(self, 0.001, f64::INFINITY) {
+            return if let Some((ray, color)) = material::scatter(rec.material, self, &rec) {
+                color * ray.ray_color(world, depth - 1)
             } else {
                 Color::BLACK
             };

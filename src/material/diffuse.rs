@@ -10,8 +10,8 @@ pub struct Diffuse {
 unsafe impl Send for Diffuse {}
 unsafe impl Sync for Diffuse {}
 
-impl Material for Diffuse {
-    fn scatter(&self, _r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
+impl  Diffuse {
+    pub fn scatter(&self, record: &HitRecord) -> Option<(Ray, Color)> {
         let mut direction: Vec3 = record.normal + Vec3::new_random_unit_vector();
         // other possibilities:
         // new_random_in_unit_sphere();
@@ -28,9 +28,7 @@ impl Material for Diffuse {
         let attenuation: Color = self.albedo;
         Some((scattered, attenuation))
     }
-}
 
-impl Diffuse {
     pub fn new(albedo: Color) -> Diffuse {
         Diffuse { albedo }
     }

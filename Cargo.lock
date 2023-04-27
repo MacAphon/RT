@@ -610,6 +610,7 @@ dependencies = [
  "image",
  "png",
  "rand",
+ "scoped_threadpool",
  "serde",
  "serde_yaml",
 ]

@@ -13,8 +13,8 @@ pub struct Dielectric {
 unsafe impl Send for Dielectric {}
 unsafe impl Sync for Dielectric {}
 
-impl Material for Dielectric {
-    fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
+impl Dielectric {
+    pub fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
         let refraction_ratio: f64 = if record.front_face {
             1. / self.ir
         } else {
@@ -44,9 +44,7 @@ impl Material for Dielectric {
 
         Some((scattered, self.attenuation))
     }
-}
 
-impl Dielectric {
     pub fn new(ir: f64, attenuation: Color) -> Dielectric {
         Dielectric { ir, attenuation }
     }

@@ -11,8 +11,8 @@ pub struct Metal {
 unsafe impl Send for Metal {}
 unsafe impl Sync for Metal {}
 
-impl Material for Metal {
-    fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
+impl Metal {
+    pub fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Color)> {
         let reflected: Vec3 = r_in.direction.unit_vector().reflect(record.normal);
         let scattered: Ray = Ray {
             origin: record.pos,
@@ -26,9 +26,7 @@ impl Material for Metal {
             None
         }
     }
-}
 
-impl Metal {
     pub fn new(albedo: Color, fuzz: f64) -> Metal {
         Metal { albedo, fuzz }
     }
