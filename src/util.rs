@@ -39,10 +39,10 @@ pub fn print_progress<T: Into<f64>>(progress: T, max: T) {
     let progress: f64 = progress.into() / max.into();
     let progress_number: String = (progress * 100.).round().to_string();
     let number_padding: String = " ".repeat(3 - progress_number.len());
-    let progress_bar: String = "".repeat((progress * 20.).round() as usize);
-    let bar_start: String = if progress == 0. {""} else {""}.to_owned();
-    let bar_end : String = if progress == 1. {""} else {""}.to_owned();
-    let bar_padding: String = "".repeat(20 - (progress * 20.).round() as usize);
+    let progress_bar: String = "=".repeat((progress * 40.).round() as usize);
+    let bar_start: String = "[".to_owned();
+    let bar_end : String = "]".to_owned();
+    let bar_padding: String = " ".repeat(40 - (progress * 40.).round() as usize);
 
     io::stderr()
         .write_all(

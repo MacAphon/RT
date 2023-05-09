@@ -1,5 +1,4 @@
 use crate::hittable::hit_record::HitRecord;
-use crate::hittable::Hittable;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
@@ -39,11 +38,19 @@ impl Sphere {
         Some(HitRecord::new(r, pos, root, &self.material, outward_normal))
     }
 
+    pub fn distance(&self, start: Point3) -> f64 {
+        (self.center - start).length() - self.radius
+    }
+
     pub fn new(center: Point3, radius: f64, material: Material) -> Sphere {
         Sphere {
             center,
             radius,
             material,
         }
+    }
+
+    pub fn direction_to(&self, origin: Point3) -> Vec3 {
+        origin - self.center
     }
 }

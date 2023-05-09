@@ -11,25 +11,27 @@ use crate::ray::Ray;
 use crate::util::print_progress;
 use crate::vec3::{Color, Point3, Vec3};
 use clap::Parser;
-use rand::random;
-use std::path::PathBuf;
-use std::sync::Arc;
-use std::thread;
 use image::Rgb;
-use crate::hittable::hit_record::HitRecord;
+use rand::random;
+use scoped_threadpool::Pool;
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 
 const DEFAULT_PATH: &str = "output/out.png";
 const DEFAULT_HEIGHT: u32 = 256;
 const DEFAULT_WIDTH: u32 = 341; // 4/3 * 256
 const DEFAULT_SAMPLES: usize = 100;
 const DEFAULT_DEPTH: usize = 16;
+const DEFAULT_POOLS: u32 = 8;
 
-const CAMERA_ORIGIN: Point3 = Point3::new(13., 2., 3.);
-const CAMERA_TARGET: Point3 = Point3::new(0., 0., 0.);
+const CAMERA_ORIGIN: Point3 = Point3::new(2., 0.5, 0.);
+const CAMERA_TARGET: Point3 = Point3::new(0., 0.5, 0.);
+//const CAMERA_ORIGIN: Point3 = Point3::new(13., 2., 3.);
+//const CAMERA_TARGET: Point3 = Point3::new(0., 0., 0.);
 const V_UP: Vec3 = Vec3::new(0., 1., 0.);
-const V_FOV: f64 = 15.; // FOV in the vertical axis
-const APERTURE: f64 = 0.1;
-const FOCUS_DIST: f64 = 10.;
+const V_FOV: f64 = 40.; // FOV in the vertical axis
+const APERTURE: f64 = 0.02;
+const FOCUS_DIST: f64 = 2.;
 
 #[derive(Parser)]
 struct Cli {
@@ -54,6 +56,10 @@ struct Cli {
     /// A higher number means higher image quality, but also increased rendering times.
     #[arg(short, long, default_value_t=DEFAULT_DEPTH)]
     depth: usize,
+
+    /// Number of parallel threads
+    #[arg(short, long, default_value_t=DEFAULT_POOLS)]
+    threads: u32,
 }
 
 fn main() -> Result<(), ()> {
@@ -64,6 +70,7 @@ fn main() -> Result<(), ()> {
     let width: u32 = cli.width;
     let samples: usize = cli.samples;
     let max_depth: usize = cli.depth;
+    let num_pools: u32 = cli.threads;
 
     eprintln!("Starting render:");
     eprintln!("- {} by {} pixels", height, width);
@@ -82,47 +89,55 @@ fn main() -> Result<(), ()> {
 
     let world: Arc<HittableList> = Arc::new(hittable::hittable_list::generate_world());
 
-    let mut children = vec![];
-    let mut finished: usize = 0;
-    print_progress(finished as u32, height);
-
-    for y in 0..height {
-        let world_cl = world.clone();
-        children.push(thread::spawn(move || -> Vec<Rgb<u8>> {
-            let mut pixels: Vec<Rgb<u8>> = Vec::with_capacity(width as usize);
-            
-            for x in 0..width {
-                let mut col: Color = Color::new(0., 0., 0.);
-
-                for _ in 0..samples {
-                    let u: f64 = (x as f64 + random::<f64>()) / width as f64;
-                    let v: f64 = ((height - y) as f64 + random::<f64>()) / height as f64;
-
-                    let ray: Ray = cam.get_ray(u, v);
-
-                    let mut rec: HitRecord = HitRecord::new_default();
-                    col += ray.ray_color(&mut rec, &world_cl, 16);
-                }
-                pixels.push(col.to_rgb_pixel(samples));
-            }
-            pixels
-        }))
-    }
-
-    let mut image = Vec::with_capacity(height as usize);
-
-    for child in children {
-        let x = child.join().unwrap();
-        image.push(x);
-        finished += 1;
+    /* let mut children = vec![];
+        let mut finished: usize = 0;
         print_progress(finished as u32, height);
-    }
+    */
+    let mut pool = Pool::new(num_pools);
 
-    eprintln!("\nDone.");
+    let mut image: Arc<Mutex<Vec<Vec<Rgb<u8>>>>> =
+        Arc::new(Mutex::new(vec![
+            vec![Rgb::from([0, 0, 0]); width as usize];
+            height as usize
+        ]));
+
+    print_progress(0, 1);
+
+    pool.scoped(|scope| {
+        for y in 0..height {
+            for x in 0..width {
+                let world_cl = world.clone();
+                let image_cl = image.clone();
+                scope.execute(move || {
+                    let mut col: Color = Color::new(0., 0., 0.);
+
+                    for _ in 0..samples {
+                        let u: f64 = (x as f64 + random::<f64>()) / width as f64;
+                        let v: f64 = ((height - y as u32) as f64 + random::<f64>()) / height as f64;
+
+                        let ray: Ray = cam.get_ray(u, v);
+
+                        col += ray.ray_color(&world_cl, 16);
+                    }
+
+                    let mut image_cl = image_cl.lock().unwrap();
+                    image_cl[y as usize][x as usize] = col.to_rgb_pixel(samples);
+                    print_progress(y*width + x, width*height);
+                })
+            }
+        }
+    });
 
     let mut imgbuf = image::ImageBuffer::new(width, height);
 
-    for (y, row) in image.iter().enumerate() {
+    for (y, row) in Arc::<Mutex<Vec<Vec<Rgb<u8>>>>>::try_unwrap(image)
+        .ok()
+        .unwrap()
+        .into_inner()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
         for (x, pixel) in row.iter().enumerate() {
             imgbuf.put_pixel(x as u32, y as u32, pixel.to_owned())
         }

@@ -1,5 +1,4 @@
 use crate::hittable::hit_record::HitRecord;
-use crate::material::Material;
 use crate::ray::Ray;
 use crate::util::min_v;
 use crate::vec3::{Color, Vec3};

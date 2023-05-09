@@ -19,11 +19,22 @@ impl Ray {
         }
 
         if let Some(rec) = world.hit_anything(self, 0.001, f64::INFINITY) {
-            return if let Some((ray, color)) = material::scatter(rec.material, self, &rec) {
-                color * ray.ray_color(world, depth - 1)
-            } else {
-                Color::BLACK
-            };
+
+            match rec.material {
+                material::Material::Light(l) => return l.albedo,
+                _ => {
+                    return if let Some((ray, color)) = material::scatter(rec.material, self, &rec) {
+
+                        let (light_color, distance) = world.light_ray(ray.origin);
+        
+                        color * ray.ray_color(world, depth - 1)
+                            + color * light_color * distance.powf(1. / 3.)
+        
+                    } else {
+                        Color::BLACK
+                    }
+                }
+            }
         }
 
         // if we don't hit anything, draw the background

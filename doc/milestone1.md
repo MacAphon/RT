@@ -18,17 +18,17 @@ Raytracing ist eine Technik zur erstellung von 3D-Grafik bei der einzelne Lichts
 
 #### Verbindlich
 
-- Erstellen von Bildern durch Raytracing
-- Mehrere darstellbare Objekte
-- Verschiedene Materialien
+- Erstellen von Bildern durch Raytracing 🟢
+- Mehrere darstellbare Objekte 🟢
+- Verschiedene Materialien 🟢
 
 #### Optional
 
-- Transparenz
-	- Lichtbrechung
-- Multithreading
-- Verschiedene Ausgabeformate
-- Lichtquellen
-- Verschiedene Objekttypen
-- Lesen der Welt aus Dateien
-- Optimierungen
+- Transparenz 🟢
+	- Lichtbrechung 🟢
+- Multithreading 🟢
+- Verschiedene Ausgabeformate 🟢
+- Lichtquellen 🟢
+- Verschiedene Objekttypen 🔴
+- Lesen der Welt aus Dateien 🔴
+- Optimierungen 🟡
