@@ -28,6 +28,7 @@ const CAMERA_ORIGIN: Point3 = Point3::new(2., 0.5, 0.);
 const CAMERA_TARGET: Point3 = Point3::new(0., 0.5, 0.);
 //const CAMERA_ORIGIN: Point3 = Point3::new(13., 2., 3.);
 //const CAMERA_TARGET: Point3 = Point3::new(0., 0., 0.);
+//const V_FOV: f64 = 15.;
 const V_UP: Vec3 = Vec3::new(0., 1., 0.);
 const V_FOV: f64 = 40.; // FOV in the vertical axis
 const APERTURE: f64 = 0.02;
@@ -95,7 +96,7 @@ fn main() -> Result<(), ()> {
     */
     let mut pool = Pool::new(num_pools);
 
-    let mut image: Arc<Mutex<Vec<Vec<Rgb<u8>>>>> =
+    let image: Arc<Mutex<Vec<Vec<Rgb<u8>>>>> =
         Arc::new(Mutex::new(vec![
             vec![Rgb::from([0, 0, 0]); width as usize];
             height as usize

@@ -81,6 +81,7 @@ impl HittableList {
 pub fn generate_world() -> HittableList {
     let mut world: HittableList = HittableList::new();
 
+
     // #########################################################################
     // Cornell Box
 

@@ -3,3 +3,11 @@
 /output
 /.idea
 /.vscode
+/doc/Ausarbeitung/*
+!/doc/Ausarbeitung/main.pdf
+!/doc/Ausarbeitung/main.tex
+!/doc/Ausarbeitung/titlepage.tex
+!/doc/Ausarbeitung/sources.bib
+!/doc/Ausarbeitung/images/*
+
+```
